@@ -12,7 +12,12 @@
           placeholder="O que precisa ser feito?"
           class="flex-1 px-2 py-1 border border-gray-500 rounded outline-none"
         >
-        <button class="px-3 py-1 text-sm font-semibold rounded text-white bg-blue-800">Adicionar</button>
+
+        <button
+          class="px-3 py-1 text-sm font-semibold rounded text-white bg-blue-800"
+        >
+          Adicionar
+        </button>
       </form>
 
       <ul class="w-full py-6">
@@ -22,7 +27,15 @@
           class="flex items-center py-2"
         >
           <span class="flex-1">
-            {{ task.text }}
+            <nuxt-link
+              :to="`/tasks/${task._id}`"
+              :class="{
+                'line-through text-gray-400': task.done,
+                'text-blue-800': !task.done
+              }"
+            >
+              {{ task.text }}
+            </nuxt-link>
           </span>
 
           <button
