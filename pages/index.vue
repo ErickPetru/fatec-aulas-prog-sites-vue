@@ -51,12 +51,36 @@
 </template>
 
 <script>
+import io from 'socket.io-client'
+
 export default {
   data() {
     return {
       inputText: '',
       tasks: []
     }
+  },
+
+  mounted() {
+    const socket = io('http://localhost:8080')
+
+    socket.on('todo-created', (serverTask) => {
+      this.tasks.push(serverTask)
+    })
+
+    socket.on('todo-updated', (serverTask) => {
+      const localTask = this.tasks.find((localTask) =>
+        localTask._id === serverTask._id
+      )
+      localTask.text = serverTask.text
+      localTask.done = serverTask.done
+    })
+
+    socket.on('todo-removed', (serverTask) => {
+      this.tasks = this.tasks.filter((localTask) =>
+        localTask._id !== serverTask._id
+      )
+    })
   },
 
   async fetch() {
@@ -71,13 +95,11 @@ export default {
       }
 
       await this.$axios.$post('http://localhost:8080/todos', task)
-      await this.$fetch()
       this.inputText = ''
     },
 
     async removeTask(task) {
       await this.$axios.$delete(`http://localhost:8080/todos/${task._id}`)
-      await this.$fetch()
     }
   }
 }
